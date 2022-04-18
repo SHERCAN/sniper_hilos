@@ -11,7 +11,6 @@ import email
 from json import load, loads
 from time import sleep
 from binance.client import Client
-from check_exe import create_order_exe
 datos={'side':'','id':5354530132,'symbol':'BTCBUSD','quantity':0.001,
     'price':40542.5,'take_l':0.009,'take_s':0.017,'stop':0.03}
 with open('json_data.json') as json_file:
