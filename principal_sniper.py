@@ -12,8 +12,8 @@ from json import load, loads
 from time import sleep
 from binance.client import Client
 from check_exe import create_order_exe
-datos={'side':'','id':'','symbol':'','quantity':'',
-'price':'','take_l':0.009,'take_s':0.017,'stop':0.03}
+datos={'side':'','id':5354530132,'symbol':'BTCBUSD','quantity':0.001,
+    'price':40542.5,'take_l':0.009,'take_s':0.017,'stop':0.03}
 with open('json_data.json') as json_file:
     claves = load(json_file)
 client = Client(claves['shercan']['key'],claves['shercan']['secret'])
@@ -112,7 +112,7 @@ def create_order_exe(order_id,intro:str):
         order=client.futures_get_order(orderId=order_id,symbol=datos['symbol'])
         print(intro,order['status'],order['orderId'])
         if order['status']=='FILLED' and intro=='create':
-            datos['price']=order['avgPrice']
+            #datos['price']=order['avgPrice']
             stop_loss(datos['side'])
             take_profit(datos['side'])
             break            
@@ -165,4 +165,4 @@ def inicio():
         empezar=True
         sleep(0.5)
 if __name__ == "__main__":
-    inicio()
+    create_order_exe(5354530132,'create')
