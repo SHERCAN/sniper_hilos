@@ -11,8 +11,8 @@ import email
 from json import load, loads
 from time import sleep
 from binance.client import Client
-datos={'side':'','id':5354530132,'symbol':'BTCBUSD','quantity':0.001,
-    'price':40542.5,'take_l':0.009,'take_s':0.017,'stop':0.03}
+datos={'side':'BUY','id':5354530132,'symbol':'BTCBUSD','quantity':0.001,
+    'price':40542.5,'take_l':0.009,'take_s':0.017,'stop':0.03,'leverage':5}
 with open('data.json') as json_file:
     claves = load(json_file)
 client = Client(claves['shercan']['key'],claves['shercan']['secret'])
@@ -42,22 +42,22 @@ posicion=''
 def create_order(position:str,symbol:str):
     datos['symbol']=symbol.replace('PERP','')
     balance=client.futures_account_balance()
-    balance=2.1#[x['balance'] for x in balance if x['asset']=='BUSD'][0]
+    balance=float([x['balance'] for x in balance if x['asset']=='BUSD'][0])/2
     #print(balance)
     try:
         client.futures_cancel_all_open_orders(symbol=symbol)
     except:
         pass
-    """ order=client.futures_create_order(
+    order=client.futures_create_order(
         symbol=datos['symbol'], 
         side=position, 
         type='MARKET', 
         quantity=str((balance*30)/float(
             client.futures_symbol_ticker(symbol=datos['symbol'])['price']))[0:5]
-        ) """
+        )
     datos['side']=position
-    datos['quantity']=0.001#order['origQty']
-    datos['id']=5331681067#order['orderId']
+    datos['quantity']=order['origQty']
+    datos['id']=order['orderId']
     #print(datos)
     order_exe=Thread(target= create_order_exe, args=(datos['id'],'create',))
     order_exe.start()    
@@ -111,7 +111,7 @@ def create_order_exe(order_id,intro:str):
         order=client.futures_get_order(orderId=order_id,symbol=datos['symbol'])
         print(intro,order['status'],order['orderId'])
         if order['status']=='FILLED' and intro=='create':
-            #datos['price']=order['avgPrice']
+            datos['price']=order['avgPrice']
             stop_loss(datos['side'])
             take_profit(datos['side'])
             break            
@@ -123,7 +123,8 @@ def create_order_exe(order_id,intro:str):
             break
         sleep(2)
 def inicio():
-    empezar=True#--------------------------------
+    print('Inicio del bot escaner correo')
+    empezar=False
     mensaje=''
     mail_viejo=''
     nuevo=''
@@ -147,11 +148,13 @@ def inicio():
                 nuevo=loads(mail_nuevo.replace('Alerta: ',''))
                 print(nuevo, end="")
                 if nuevo['position']=='1' and nuevo['order']=='buy':
-                    print('long')
+                    #print('long')
                     create_order('BUY',nuevo['ticker'])
+                    mensaje='Se realizo una orden en long'
                 elif nuevo['position']=='-1' and nuevo['order']=='sell':
-                    print('short')
+                    #print('short')
                     create_order('SELL',nuevo['ticker'])
+                    mensaje='Se realizo una orden en short'
             except:
                 pass
             if nuevo != 'null':
@@ -164,4 +167,4 @@ def inicio():
         empezar=True
         sleep(0.5)
 if __name__ == "__main__":
-    create_order_exe(5354530132,'create')
+    inicio()
