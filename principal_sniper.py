@@ -13,7 +13,7 @@ from time import sleep
 from binance.client import Client
 datos={'side':'','id':5354530132,'symbol':'BTCBUSD','quantity':0.001,
     'price':40542.5,'take_l':0.009,'take_s':0.017,'stop':0.03}
-with open('json_data.json') as json_file:
+with open('data.json') as json_file:
     claves = load(json_file)
 client = Client(claves['shercan']['key'],claves['shercan']['secret'])
 datos['take_l']=claves['limits']['take_l']
@@ -22,7 +22,7 @@ datos['stop']=claves['limits']['stop']
 #credentials
 username =claves['account']['mail']
 #generated app password
-app_password= claves['account']['mail']
+app_password= claves['account']['pass']
 # https://www.systoolsgroup.com/imap/
 gmail_host= 'imap.gmail.com'
 #set connection
